@@ -1,0 +1,37 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      refineMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Near-nozzle refinement, pass 2: 0.5 mm -> 0.25 mm in all 3 directions
+// cylinder r = 10 mm, from the top wall down to z = -12 mm
+// (at 5 mm below the tip neighbouring plumes are only ~2.7 mm apart -> ~11 cells)
+// Used by Allrun when MESH_REFINE=1 (copied to system/refineMeshDict).
+
+coordinates
+{
+    type            global;
+    e1              (1 0 0);
+    e2              (0 1 0);
+    directions      (e1 e2 e3);
+}
+
+zone
+{
+    type            cylinder;
+    point1          (0 0  0.001);
+    point2          (0 0 -0.012);
+    radius          0.010;
+}
+
+// ************************************************************************* //

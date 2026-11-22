@@ -32,6 +32,20 @@ Output goes to `validation/`: `fig11_penetration.png`, `fig14_liquid_mass_ratio.
 | rho0 / Cp0 | 1000 / 4187 (water) | 633 / 2300 (iso-octane @ 363 K) | cosmetic: sprayCloud overwrites these from the IC8H18 liquid model |
 | Output | ascii, nothing extra | ascii.gz, `cloudInfo` function object, writeCellCentres + VTK | needed for the ECN metrics |
 
+## Near-nozzle mesh refinement (plume-collapse fix)
+
+The first M1 run showed plume collapse (r/a of the leading parcels 0.49 -> 0.22 -> 0.10 at
+0.4/0.8/1.2 ms; straight 35-deg plumes = 0.70). 5 mm below the tip neighbouring plumes are only
+~2.7 mm apart = 2-3 cells at 1 mm, so the 8 plumes are numerically merged into one hollow cone.
+
+```sh
+MESH_REFINE=1 sh Allrun smoke     # check refineMesh works + cell count (printed from checkMesh)
+MESH_REFINE=1 ./Allrun 4          # full run, ~1.4 M cells, roughly 4-5 h on 4 cores
+```
+Two nested `refineMesh` passes (v14 `zone` syntax): `system/refineMeshDict.l1` 1 -> 0.5 mm in a
+cylinder r = 25 mm, z down to -30 mm; `system/refineMeshDict.l2` 0.5 -> 0.25 mm, r = 10 mm,
+z down to -12 mm.
+
 ## Calibration knobs (edit with the generator, not by hand)
 
 ```sh
