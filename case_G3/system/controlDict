@@ -1,0 +1,54 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solver          multicomponentFluid;
+
+startFrom       startTime;
+startTime       0;
+
+stopAt          endTime;
+endTime         1.56e-3;        // 2 x injection duration, as Lien et al.
+
+deltaT          1e-07;
+adjustTimeStep  yes;
+maxCo           0.3;
+maxDeltaT       1e-06;          // keep the spray time step <= 1 us
+
+writeControl    adjustableRunTime;
+writeInterval   5e-05;          // 32 frames; post-processing uses these
+
+purgeWrite      0;
+writeFormat     ascii;          // ascii + gzip: readable by postprocess/g3_validate.py
+writePrecision  7;
+writeCompression on;
+timeFormat      general;
+timePrecision   6;
+
+runTimeModifiable yes;
+
+functions
+{
+    // total liquid mass, parcel count, D32... every time step -> Fig. 14 (liquid mass ratio)
+    // (g3_validate.py also parses "Current mass in system" from log.foamRun as a backup)
+    cloudInfo
+    {
+        type            cloudInfo;
+        libs            ("liblagrangianFunctionObjects.so");
+        clouds          (cloud);
+    }
+}
+
+// ************************************************************************* //

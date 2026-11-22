@@ -1,0 +1,284 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Version:  14
+    \\  /    A nd           | Website:  www.openfoam.org
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      cloudProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type        sprayCloud;
+cpuLoad     true;
+
+solution
+{
+    coupled         true;
+    transient       yes;
+    cellValueSourceCorrection on;
+    maxCo           0.3;
+
+    sourceTerms
+    {
+        schemes
+        {
+            rho             explicit 1;
+            U               explicit 1;
+            Yi              explicit 1;
+            h               explicit 1;
+            radiation       explicit 1;
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        mu              cell;
+        T               cell;
+        Cp              cell;
+        kappa           cell;
+        p               cell;
+    }
+
+    integrationSchemes
+    {
+        U               Euler;
+        T               analytical;
+    }
+}
+
+constantProperties
+{
+    T0              363;
+    rho0            700;
+    Cp0             2200;
+    constantVolume  false;
+}
+
+subModels
+{
+    particleForces
+    {
+        sphereDrag;
+    }
+
+    injectionModels
+    {
+        model0
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 0.573576 0.0);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+        model1
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 0.405580 0.405580);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+        model2
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 0.0 0.573576);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+        model3
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 -0.405580 0.405580);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+        model4
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 -0.573576 0.0);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+        model5
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 -0.405580 -0.405580);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+        model6
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 0.0 -0.573576);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+        model7
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          165e-6;
+            duration        0.78e-3;
+            position        (0.0001 0 0);
+            direction       (0.819152 0.405580 -0.405580);
+            parcelsPerSecond 500000;
+            flowRateProfile table ((0 1.603e-3) (0.78e-3 1.603e-3) (0.780001e-3 0) (1000 0));
+            Cd              constant 0.73;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 15.0;
+            sizeDistribution { type fixedValue; value 165e-6; }
+        }
+    }
+
+    dispersionModel         none;
+    patchInteractionModel   standardWallInteraction;
+    heatTransferModel       RanzMarshall;
+    compositionModel        singlePhaseMixture;
+    phaseChangeModel        liquidEvaporation;
+    surfaceFilmModel        none;
+    atomisationModel        none;
+    breakupModel            ReitzKHRT;
+    stochasticCollisionModel none;
+    radiation               off;
+
+    standardWallInteraction
+    {
+        type            rebound;
+    }
+
+    RanzMarshall
+    {
+        BirdCorrection  true;
+    }
+
+    singlePhaseMixture
+    {
+        phases
+        (
+            liquid
+            {
+                IC8H18          1;
+            }
+        );
+    }
+
+    liquidEvaporation
+    {
+        enthalpyTransfer enthalpyDifference;
+        activeLiquids    ( IC8H18 );
+    }
+
+    ReitzKHRT
+    {
+        solveOscillationEq yes;
+        B0              0.61;
+        B1              40;
+        Ctau            1;
+        CRT             0.1;
+        msLimit         0.2;
+        WeberLimit      6;
+    }
+}

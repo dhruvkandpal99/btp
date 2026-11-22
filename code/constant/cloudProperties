@@ -1,0 +1,411 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      cloudProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type        sprayCloud;
+
+cpuLoad     true;
+
+solution
+{
+    coupled         true;
+    transient       yes;
+    cellValueSourceCorrection on;
+    maxCo           0.3;
+
+    sourceTerms
+    {
+        schemes
+        {
+            rho             explicit 1;
+            U               explicit 1;
+            Yi              explicit 1;
+            h               explicit 1;
+            radiation       explicit 1;
+        }
+    }
+
+    interpolationSchemes
+    {
+        rho             cell;
+        U               cellPoint;
+        mu              cell;
+        T               cell;
+        Cp              cell;
+        kappa           cell;
+        p               cell;
+    }
+
+    integrationSchemes
+    {
+        U               Euler;
+        T               analytical;
+    }
+}
+
+constantProperties
+{
+    T0              363;
+    rho0            1000;
+    Cp0             4187;
+    constantVolume  false;
+}
+
+subModels
+{
+    particleForces
+    {
+        sphereDrag;
+    }
+
+    injectionModels
+    {
+        hole1
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 0.00050 0.00000);
+            direction       (0.7986 0.6018 0.0000);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+        hole2
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 0.00035 0.00035);
+            direction       (0.7986 0.4255 0.4255);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+        hole3
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 0.00000 0.00050);
+            direction       (0.7986 0.0000 0.6018);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+        hole4
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 -0.00035 0.00035);
+            direction       (0.7986 -0.4255 0.4255);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+        hole5
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 -0.00050 0.00000);
+            direction       (0.7986 -0.6018 0.0000);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+        hole6
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 -0.00035 -0.00035);
+            direction       (0.7986 -0.4255 -0.4255);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+        hole7
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 0.00000 -0.00050);
+            direction       (0.7986 0.0000 -0.6018);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+        hole8
+        {
+            type            coneInjection;
+            SOI             0;
+            massTotal       1.25e-6;
+            uniformParcelSize volume;
+            injectionMethod disc;
+            flowType        flowRateAndDischarge;
+            dInner          0;
+            dOuter          1.65e-4;
+            duration        7.8e-4;
+            position        (0.00010 0.00035 -0.00035);
+            direction       (0.7986 0.4255 -0.4255);
+            parcelsPerSecond 2500000;
+            flowRateProfile table
+            (
+                (0          0.0)
+                (5e-5       0.0016)
+                (7e-4       0.0016)
+                (7.8e-4     0.0)
+            );
+            Cd              constant 0.52;
+            thetaInner      constant 0.0;
+            thetaOuter      constant 3.5;
+            sizeDistribution
+            {
+                type        RosinRammler;
+                Q           3;
+                min         1e-05;
+                max         0.000165;
+                d           5.0e-05;
+                n           3;
+            }
+        }
+    }
+
+    dispersionModel         none;
+
+    patchInteractionModel   standardWallInteraction;
+
+    heatTransferModel       RanzMarshall;
+
+    compositionModel        singlePhaseMixture;
+
+    phaseChangeModel        liquidEvaporationBoil;
+
+    surfaceFilmModel        none;
+
+    atomisationModel        none;
+
+    breakupModel            ReitzKHRT;
+
+    stochasticCollisionModel none;
+
+    radiation               off;
+
+    standardWallInteraction
+    {
+        type                rebound;
+    }
+
+    RanzMarshall
+    {
+        BirdCorrection      true;
+    }
+
+    singlePhaseMixture
+    {
+        phases
+        (
+            liquid
+            {
+                IC8H18              1;
+            }
+        );
+    }
+
+    liquidEvaporationBoil
+    {
+        enthalpyTransfer    enthalpyDifference;
+        activeLiquids       ( IC8H18 );
+    }
+
+    ReitzKHRT
+    {
+        solveOscillationEq  yes;
+        B0                  0.61;
+        B1                  55;
+        Ctau                1;
+        CRT                 0.1;
+        msLimit             0.2;
+        WeberLimit          6;
+    }
+}
+
+cloudFunctions
+{}
+
+// ************************************************************************* //

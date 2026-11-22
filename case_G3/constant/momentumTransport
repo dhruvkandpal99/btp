@@ -1,0 +1,43 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      momentumTransport;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+simulationType  RAS;
+
+RAS
+{
+    model           kEpsilon;
+    turbulence      on;
+    printCoeffs     on;
+
+    // Round-jet correction commonly used for RANS spray simulations
+    // (standard k-epsilon over-spreads round jets with C1 = 1.44).
+    // Calibration knob: 1.44 (standard) ... 1.60.
+    kEpsilonCoeffs
+    {
+        C1              1.55;
+    }
+}
+
+// LES (Lien et al. used LES on 15 M cells - not the baseline here)
+LES
+{
+    model           WALE;
+    delta           cubeRootVol;
+    turbulence      on;
+    printCoeffs     on;
+}
+
+// ************************************************************************* //

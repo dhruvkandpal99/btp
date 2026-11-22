@@ -1,0 +1,5 @@
+# OpenFOAM dictionaries and shell scripts must stay LF, also when checked out on Windows
+* text=auto eol=lf
+*.mat binary
+*.png binary
+*.pdf binary

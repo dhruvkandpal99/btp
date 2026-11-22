@@ -1,0 +1,44 @@
+# ---------- BTP repo: track code only ----------
+
+# Papers, slides, notes, media (keep local only)
+*.pdf
+*.rtf
+*.jpeg
+*.jpg
+*.png
+*.mp4
+*.zip
+.DS_Store
+
+# Raw ECN data (.mat, ~18 MB) - the processed CSV lives in postprocess/
+ecn/
+
+# ---------- OpenFOAM results ----------
+# time directories (keep 0/): 5e-05, 0.0001, 1.5e-03, 2e-06 ...
+[0-9]*e-[0-9]*/
+[0-9]*e+[0-9]*/
+0.[0-9]*/
+[1-9]*/
+# generated mesh (rebuilt by blockMesh)
+polyMesh/
+# parallel / post-processing output
+processor*/
+postProcessing/
+VTK/
+validation/
+lagrangian/
+dynamicCode/
+log.*
+*.foam
+*.OpenFOAM
+# writeCellCentres output in 0/
+**/0/C
+**/0/C.gz
+**/0/Cx*
+**/0/Cy*
+**/0/Cz*
+
+# ---------- Python ----------
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

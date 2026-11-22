@@ -1,0 +1,39 @@
+#!/bin/sh
+# ECN Spray G3 - OpenFOAM v14 (multicomponentFluid + sprayCloud)
+# usage:  ./Allrun [nProcs]          (default 4, must match system/decomposeParDict)
+#         ./Allrun smoke             (serial, 20 time steps, just to catch dictionary errors)
+cd "$(dirname "$0")" || exit 1
+
+NP=${1:-4}
+
+run() {   # run <log> <command...>
+    log=$1; shift
+    echo "running: $*  > $log"
+    "$@" > "$log" 2>&1 || { echo "FAILED - see $log"; tail -20 "$log"; exit 1; }
+}
+
+python3 tools/make_cloudProperties.py          # regenerate cloudProperties from the script defaults
+
+run log.blockMesh  blockMesh
+run log.checkMesh  checkMesh
+
+if [ "$NP" = "smoke" ]; then
+    # quick dictionary check: a few steps in serial, no writing
+    foamDictionary -entry endTime -set 2e-6 system/controlDict > /dev/null
+    run log.smoke foamRun
+    foamDictionary -entry endTime -set 1.56e-3 system/controlDict > /dev/null
+    grep -E "Current number of parcels|Current mass in system" log.smoke | tail -4
+    echo "smoke test OK"
+    exit 0
+fi
+
+run log.decomposePar   decomposePar -force
+echo "running: mpirun -np $NP foamRun -parallel  > log.foamRun"
+mpirun -np "$NP" foamRun -parallel > log.foamRun 2>&1 || { echo "FAILED - see log.foamRun"; exit 1; }
+run log.reconstructPar reconstructPar
+
+# --- data for postprocess/g3_validate.py ---
+run log.writeCellCentres foamPostProcess -func writeCellCentres -time 0     # writes 0/Cz used for vapour penetration
+run log.foamToVTK        foamToVTK -ascii -useTimeName -noInternal          # parcels -> VTK/lagrangian/cloud/*.vtk
+
+echo "done. Now:  python3 ../postprocess/g3_validate.py ."

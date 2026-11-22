@@ -1,0 +1,84 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  14
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//
+// ECN Spray G constant-volume chamber, 100 mm cube (as Lien et al. 2024).
+// Injector tip at the origin (centre of the top wall), injector axis = -z.
+//
+//   x, y : [-50, 50] mm   uniform core |x|,|y| <= 40 mm, graded outer 10 mm
+//   z    : [-100, 0] mm   uniform core  z >= -80 mm,     graded bottom 20 mm
+//
+// Mesh levels for the grid study - uncomment ONE block:
+//
+//   level  core cell   cells
+//   M0     1.51 mm     223 k
+//   M1     1.00 mm     762 k   (default)
+//   M2     0.75 mm     1.8 M
+//
+// M0
+// nCore 53;  nOut 4;  gOut 2.456;  nzOut 7;  gzOut 3.111;
+// M1
+nCore 80;  nOut 6;  gOut 2.517;  nzOut 10;  gzOut 3.434;
+// M2
+// nCore 107; nOut 8;  gOut 2.547;  nzOut 13;  gzOut 3.615;
+
+nx  #calc "$nCore + 2*$nOut";
+nz  #calc "$nCore + $nzOut";
+gIn #calc "1.0/$gOut";
+gzIn #calc "1.0/$gzOut";
+
+scale 1;
+
+vertices
+(
+    (-0.05 -0.05 -0.10)
+    ( 0.05 -0.05 -0.10)
+    ( 0.05  0.05 -0.10)
+    (-0.05  0.05 -0.10)
+    (-0.05 -0.05  0.00)
+    ( 0.05 -0.05  0.00)
+    ( 0.05  0.05  0.00)
+    (-0.05  0.05  0.00)
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) ($nx $nx $nz)
+    simpleGrading
+    (
+        // (length fraction, cell fraction, expansion ratio) per section
+        ( (10 $nOut $gIn)  (80 $nCore 1)  (10 $nOut $gOut) )
+        ( (10 $nOut $gIn)  (80 $nCore 1)  (10 $nOut $gOut) )
+        ( (20 $nzOut $gzIn) (80 $nCore 1) )
+    )
+);
+
+boundary
+(
+    walls
+    {
+        type wall;
+        faces
+        (
+            (0 4 7 3)
+            (1 2 6 5)
+            (0 1 5 4)
+            (3 7 6 2)
+            (0 3 2 1)
+            (4 5 6 7)
+        );
+    }
+);
+
+// ************************************************************************* //
