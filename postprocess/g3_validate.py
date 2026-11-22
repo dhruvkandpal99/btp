@@ -20,6 +20,8 @@ Definitions (ECN "follow the fuel", as used by Lien et al.):
     reported as max(vapour, liquid) because schlieren sees the liquid region too.
   * Liquid mass ratio: sum(nParticle * rho * pi/6 d^3) / 10 mg.
   * Also the old metrics (max parcel tip, 95 % / 99 % liquid mass) for continuity with BTP1.
+  * Plume-collapse indicator: mean r/a of the leading parcels (axial a > 0.9 a_max);
+    ~tan(35 deg) = 0.70 for straight plumes, -> 0 when the plumes merge into one axial jet.
 """
 import argparse, glob, gzip, os, re, sys
 import numpy as np
@@ -150,6 +152,9 @@ def liquid_metrics(vtk, view_deg, pix, sigma, thr):
     vol = nP * np.pi / 6.0 * d ** 3                      # m3 liquid per parcel
     mass = vol * rho
     a = -xyz[:, 2] * 1e3
+    r = np.hypot(xyz[:, 0], xyz[:, 1]) * 1e3
+    lead = a > 0.9 * a.max()                 # leading parcels (front 10 % of the tip distance)
+    r_over_a = float(np.mean(r[lead] / np.maximum(a[lead], 1e-9))) if a.max() > 1.0 else np.nan
     o = np.argsort(a); cm = np.cumsum(mass[o]) / mass.sum()
     plv, ae, se = plv_map(xyz, vol * 1e9, view_deg, pix, sigma)
     rows = np.where((plv >= thr).any(axis=1))[0]
@@ -161,7 +166,7 @@ def liquid_metrics(vtk, view_deg, pix, sigma, thr):
     return dict(n=len(xyz), mass=mass.sum(), pen_plv=pen, tip=a.max(),
                 pen95=a[o][np.searchsorted(cm, 0.95)], pen99=a[o][min(np.searchsorted(cm, 0.99), len(a) - 1)],
                 w15=widths[15], w25=widths[25], w35=widths[35],
-                d32=(nP * d ** 3).sum() / (nP * d ** 2).sum() * 1e6)
+                d32=(nP * d ** 3).sum() / (nP * d ** 2).sum() * 1e6, r_over_a=r_over_a)
 
 
 def vapour_pen(case, tdir, cz, ythr):
@@ -229,10 +234,12 @@ def main():
         vp = vapour_pen(case, td, cz, a.y_thr) if td else np.nan
         rows.append([t * 1e3, L.get("pen_plv", 0), vp, max(vp, L.get("pen_plv", 0)) if np.isfinite(vp) else np.nan,
                      L["mass"] / M_INJ, L.get("tip", 0), L.get("pen95", 0), L.get("pen99", 0),
-                     L.get("w15", 0), L.get("w25", 0), L.get("w35", 0), L.get("d32", np.nan), L["n"]])
-        print(f"t={t*1e3:6.3f} ms  liq(PLV)={rows[-1][1]:6.2f}  vap={vp:6.2f}  mass ratio={rows[-1][4]:5.3f}  n={L['n']}")
+                     L.get("w15", 0), L.get("w25", 0), L.get("w35", 0), L.get("d32", np.nan), L["n"],
+                     L.get("r_over_a", np.nan)])
+        print(f"t={t*1e3:6.3f} ms  liq(PLV)={rows[-1][1]:6.2f}  vap={vp:6.2f}  mass ratio={rows[-1][4]:5.3f}  "
+              f"r/a={rows[-1][13]:5.2f}  n={L['n']}")
     S = np.array(rows)
-    hdr = "time_ms,liq_pen_plv_mm,vap_pen_Y_mm,vap_pen_combined_mm,liquid_mass_ratio,tip_mm,pen95_mm,pen99_mm,w15_mm,w25_mm,w35_mm,D32_um,nParcels"
+    hdr = "time_ms,liq_pen_plv_mm,vap_pen_Y_mm,vap_pen_combined_mm,liquid_mass_ratio,tip_mm,pen95_mm,pen99_mm,w15_mm,w25_mm,w35_mm,D32_um,nParcels,lead_r_over_a"
     np.savetxt(os.path.join(out, "sim_metrics.csv"), S, delimiter=",", header=hdr, comments="", fmt="%.5g")
 
     E = np.genfromtxt(a.ecn, delimiter=",", names=True)
@@ -242,7 +249,10 @@ def main():
     i_eoi = np.argmin(abs(S[:, 0] - EOI))
     summary = (f"{label}\n  liquid penetration RMSD (0.1-1.5 ms) = {r_l[0]:.2f} mm ({r_l[1]:.1f} % of mean)\n"
                f"  vapour penetration RMSD (0.1-1.5 ms) = {r_v[0]:.2f} mm ({r_v[1]:.1f} % of mean)\n"
-               f"  liquid mass ratio at EOI ({S[i_eoi,0]:.2f} ms) = {S[i_eoi,4]:.3f}   (Lien G3: ~0.45)\n")
+               f"  liquid mass ratio at EOI ({S[i_eoi,0]:.2f} ms) = {S[i_eoi,4]:.3f}   (Lien G3: ~0.45)\n"
+               f"  plume collapse, r/a of leading parcels (straight 35-deg plume = 0.70, merged jet -> 0):\n"
+               + "".join(f"    t = {S[i,0]:.2f} ms : {S[i,13]:.2f}\n" for i in
+                         [np.argmin(abs(S[:, 0] - tt)) for tt in (0.4, 0.8, 1.2, 1.5)]))
     print(summary)
     open(os.path.join(out, "summary.txt"), "w").write(summary)
 
