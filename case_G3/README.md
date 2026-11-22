@@ -50,3 +50,36 @@ the bad keyword – send it to me:
 `distortedSphereDrag`, `stochasticDispersionRAS`, `kEpsilonCoeffs`, the `cloudInfo`
 function object (lib `liblagrangianFunctionObjects.so`), `Q 0` in RosinRammler,
 the `#calc` lines in blockMeshDict, `foamToVTK -useTimeName -noInternal`.
+
+## Open issues / to investigate later
+
+### ReitzKHRT floating point exception with small droplets (possible upstream bug → contribution)
+
+**Symptom (OpenFOAM 14, build `14-7b05503f98a8`):** `foamRun` aborts with `Floating point exception`
+in `Foam::ReitzKHRT<...>::update(...)` on the **first time step**, right after the first 8 parcels
+are injected.
+
+**Reproduce:**
+```sh
+CLOUD_ARGS="--breakup ReitzKHRT" sh Allrun smoke
+```
+
+**What we know (smoke-test bisection, `tools/bisect_smoke.sh`, `tools/bisect_breakup.sh`):**
+- Fails independent of KHRT constants (B0/B1/CRT = 0.55/7/0.42 *and* the defaults 0.61/55/0.1),
+  drag model (sphereDrag / distortedSphereDrag), oscillation eq. on/off, dispersion on/off.
+- Also fails with `FOAM_SIGFPE=false` → genuine NaN/inf, not just a trapped harmless FPE.
+- Same model ran fine in the old case with Rosin-Rammler 10–165 µm droplets → triggered by the
+  small injected droplets (Lien Eq. 36, 1.6–23 µm, We ≈ 15).
+- ReitzDiwakar, TAB, ETAB also crash on step 1; PilchErdman and `none` pass.
+- First injected parcels carry very little mass (flow-rate profile starts at 0).
+
+**Suspects to check in `src/lagrangian/spray/submodels/BreakupModel/ReitzKHRT/ReitzKHRT.C`:**
+- RT branch for tiny drops: drag acceleration `Urel/tMom` is huge (~1e7–1e8 m/s²), so
+  `lambdaRT < d` already at step 1 → RT path active immediately.
+- KH mass-shedding / child-parcel branch: `ms/averageParcelMass`, `d/d0`, and the cubic solve for
+  the parent diameter (acos/cbrt/sqrt of out-of-range arguments).
+- `trajectory = U/mag(U)` and other divisions without `vSmall` guards.
+
+**Plan:** debug build (`WM_COMPILE_OPTION=Debug`) or `Info` prints in `update()` on the failing
+parcel → find the offending expression → minimal test case (single injector, fixed 2 µm droplets,
+aachenBomb-style) → report on bugs.openfoam.org with a patch.
