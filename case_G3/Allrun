@@ -12,7 +12,12 @@ run() {   # run <log> <command...>
     "$@" > "$log" 2>&1 || { echo "FAILED - see $log"; tail -20 "$log"; exit 1; }
 }
 
-python3 tools/make_cloudProperties.py          # regenerate cloudProperties from the script defaults
+# cloudProperties: regenerated from the script defaults, unless you pass generator flags via CLOUD_ARGS
+#   e.g.  CLOUD_ARGS="--drag sphereDrag --oscillation no --breakup none" sh Allrun smoke
+#   or    KEEP_CLOUD=1 sh Allrun smoke      (use constant/cloudProperties as it is)
+if [ "${KEEP_CLOUD:-0}" != "1" ]; then
+    python3 tools/make_cloudProperties.py ${CLOUD_ARGS:-} || exit 1
+fi
 
 run log.blockMesh  blockMesh
 run log.checkMesh  checkMesh
@@ -20,8 +25,14 @@ run log.checkMesh  checkMesh
 if [ "$NP" = "smoke" ]; then
     # quick dictionary check: a few steps in serial, no writing
     foamDictionary -entry endTime -set 2e-6 system/controlDict > /dev/null
-    run log.smoke foamRun
+    foamRun > log.smoke 2>&1
+    status=$?
     foamDictionary -entry endTime -set 1.56e-3 system/controlDict > /dev/null
+    if [ $status -ne 0 ]; then
+        echo "SMOKE FAILED - last lines of log.smoke:"
+        grep -E "^Time =|Current number of parcels|Current mass in system|Floating|FOAM FATAL|keyword" log.smoke | tail -15
+        exit 1
+    fi
     grep -E "Current number of parcels|Current mass in system" log.smoke | tail -4
     echo "smoke test OK"
     exit 0
