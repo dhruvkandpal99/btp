@@ -24,9 +24,9 @@ Output goes to `validation/`: `fig11_penetration.png`, `fig14_liquid_mass_ratio.
 | Plume direction | 37° | 35° | Lien Table 3 |
 | Cone half-angle | 3.5° | 15° | Lien: 30° full cone (calibration knob) |
 | Cd | 0.52 (~250 m/s) | 0.60 (~215 m/s) | start of the Cd sweep 0.52–0.73 |
-| Drag | sphereDrag | distortedSphereDrag | stock analogue of Lien's distortion-corrected drag |
+| Drag | sphereDrag | sphereDrag (distortedSphereDrag available) | distortion needs the oscillation eq. from a breakup model |
 | Turbulent dispersion | none | stochasticDispersionRAS | RANS needs it, otherwise plumes too narrow |
-| KH-RT B0 / B1 / CRT | 0.61 / 55 / 0.1 | 0.55 / 7 / 0.42 | Lien Eqs. 33–35 evaluated at We ≈ 15 |
+| Breakup | ReitzKHRT | **none** (KHRT: B0 0.55, B1 7, CRT 0.42 kept as option) | v14 ReitzKHRT hits a floating point exception on step 1 with 1.6–23 µm droplets; Lien Fig. 10: droplets are already in the oscillation/deformation regime (We ~ 15) |
 | k-ε C1 | 1.44 | 1.55 | round-jet correction for sprays |
 | parcels/s per hole | 2.5e6 | 1e7 | smoother statistics for PLV penetration |
 | rho0 / Cp0 | 1000 / 4187 (water) | 633 / 2300 (iso-octane @ 363 K) | cosmetic: sprayCloud overwrites these from the IC8H18 liquid model |

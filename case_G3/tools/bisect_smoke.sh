@@ -7,10 +7,10 @@ try() {   # try <name> <generator flags>
     printf "%-34s" "$1"
     if CLOUD_ARGS="$2" sh Allrun smoke > log.bisect_$1 2>&1; then echo PASS; else echo FAIL; fi
 }
-try A_sphereDrag_noOscillation  "--drag sphereDrag --oscillation no"
-try B_oldKHRTconstants          "$OLDKH"
+try A_sphereDrag_noOscillation  "--breakup ReitzKHRT --drag sphereDrag --oscillation no"
+try B_oldKHRTconstants          "--breakup ReitzKHRT $OLDKH"
 try C_noBreakup                 "--drag sphereDrag --oscillation no --breakup none"
-try D_noDispersion              "--dispersion none"
-try E_oldKH_sphereDrag          "--drag sphereDrag --oscillation no $OLDKH"
+try D_noDispersion              "--breakup ReitzKHRT --dispersion none"
+try E_oldKH_sphereDrag          "--breakup ReitzKHRT --drag sphereDrag --oscillation no $OLDKH"
 python3 tools/make_cloudProperties.py > /dev/null   # restore defaults
 echo "details: log.bisect_* (Allrun output) and log.smoke (last test)"

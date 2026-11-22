@@ -41,10 +41,11 @@ PARAMS = dict(
     B0=0.55, B1=7.0, CRT=0.42, Ctau=1.0, msLimit=0.2, WeberLimit=6.0,
 
     # ---- sub-model switches (debugging / ablation) ----
-    drag="distortedSphereDrag",            # or sphereDrag
+    drag="sphereDrag",                     # or distortedSphereDrag (only matters with a breakup model that solves the oscillation eq.)
     dispersion="stochasticDispersionRAS",  # or none
-    breakup="ReitzKHRT",                   # or none
-    oscillation="yes",                     # solveOscillationEq (distortedSphereDrag needs yes)
+    breakup="none",                        # none | ReitzKHRT | PilchErdman | ReitzDiwakar | TAB | ETAB
+                                           # (ReitzKHRT -> FPE on step 1 with Lien's 1.6-23 um droplets in v14)
+    oscillation="no",                      # solveOscillationEq (distortedSphereDrag needs yes)
 
     # ---- initial droplet size ----
     sizes="lien",          # "lien" (Case 1), "lienTable" (exact tabulated CDF), "blob" (Case 2)
@@ -249,6 +250,7 @@ subModels
         activeLiquids       ( IC8H18 );
     }}
 
+    // breakup model coefficients (only the one selected by breakupModel is used)
     ReitzKHRT
     {{
         solveOscillationEq  {p['oscillation']};
@@ -258,6 +260,41 @@ subModels
         CRT                 {p['CRT']};
         msLimit             {p['msLimit']};
         WeberLimit          {p['WeberLimit']};
+    }}
+
+    PilchErdman
+    {{
+        solveOscillationEq  {p['oscillation']};
+        B1                  0.375;
+        B2                  0.2274;
+    }}
+
+    ReitzDiwakar
+    {{
+        solveOscillationEq  {p['oscillation']};
+        Cbag                6;
+        cb                  0.785;
+        Cstrip              0.5;
+        Cs                  10;
+    }}
+
+    TAB
+    {{
+        solveOscillationEq  yes;
+        y0                  0;
+        yDot0               0;
+        SMDCalculationMethod method2;
+    }}
+
+    ETAB
+    {{
+        solveOscillationEq  yes;
+        Cmu                 10;
+        Comega              8;
+        WeCrit              12;
+        k1                  0.2;
+        k2                  0.2;
+        WeTransition        100;
     }}
 }}
 
