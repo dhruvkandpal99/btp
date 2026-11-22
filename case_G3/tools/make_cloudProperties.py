@@ -43,8 +43,9 @@ PARAMS = dict(
     # ---- sub-model switches (debugging / ablation) ----
     drag="sphereDrag",                     # or distortedSphereDrag (only matters with a breakup model that solves the oscillation eq.)
     dispersion="stochasticDispersionRAS",  # or none
-    breakup="none",                        # none | ReitzKHRT | PilchErdman | ReitzDiwakar | TAB | ETAB
-                                           # (ReitzKHRT -> FPE on step 1 with Lien's 1.6-23 um droplets in v14)
+    breakup="PilchErdman",                 # none | PilchErdman | ReitzKHRT | ReitzDiwakar | TAB | ETAB
+                                           # v14 smoke tests with Lien's 1.6-23 um droplets: only none and PilchErdman
+                                           # pass; ReitzKHRT/ReitzDiwakar/TAB/ETAB crash on step 1 (FPE / NaN)
     oscillation="no",                      # solveOscillationEq (distortedSphereDrag needs yes)
 
     # ---- initial droplet size ----

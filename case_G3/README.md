@@ -26,7 +26,7 @@ Output goes to `validation/`: `fig11_penetration.png`, `fig14_liquid_mass_ratio.
 | Cd | 0.52 (~250 m/s) | 0.60 (~215 m/s) | start of the Cd sweep 0.52–0.73 |
 | Drag | sphereDrag | sphereDrag (distortedSphereDrag available) | distortion needs the oscillation eq. from a breakup model |
 | Turbulent dispersion | none | stochasticDispersionRAS | RANS needs it, otherwise plumes too narrow |
-| Breakup | ReitzKHRT | **none** (KHRT: B0 0.55, B1 7, CRT 0.42 kept as option) | v14 ReitzKHRT hits a floating point exception on step 1 with 1.6–23 µm droplets; Lien Fig. 10: droplets are already in the oscillation/deformation regime (We ~ 15) |
+| Breakup | ReitzKHRT | **PilchErdman** | v14 ReitzKHRT, ReitzDiwakar, TAB, ETAB crash on step 1 (FPE/NaN) with 1.6–23 µm droplets; PilchErdman passes and is the bag/multimode correlation Lien's breakup approach builds on (Nagaoka & Kawamura). `--breakup none` = ablation |
 | k-ε C1 | 1.44 | 1.55 | round-jet correction for sprays |
 | parcels/s per hole | 2.5e6 | 1e7 | smoother statistics for PLV penetration |
 | rho0 / Cp0 | 1000 / 4187 (water) | 633 / 2300 (iso-octane @ 363 K) | cosmetic: sprayCloud overwrites these from the IC8H18 liquid model |
